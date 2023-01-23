@@ -51,6 +51,7 @@ export function DevMiningCalculator({
   const { utils, BigNumber, FixedNumber } = ethers;
   const { parseEther } = utils;
   async function getEmpInfo(address: string, toCurrency = "usd") {
+    // console.log(`For ${address}`)
     const emp = new ethers.Contract(address, empAbi, provider);
     const tokenAddress = await emp.tokenCurrency();
     const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, provider);
@@ -137,12 +138,15 @@ export function DevMiningCalculator({
     totalRewards: number;
     empWhitelist: string[];
   }) {
+    console.log("Here1");
     const allInfo = await Promise.all(
       empWhitelist.map((address) => getEmpInfo(address))
     );
 
+    console.log("Here");
     const values: any[] = [];
     const totalValue = allInfo.reduce((totalValue, info) => {
+      console.log("Here2");
       const value = calculateEmpValue(info);
       values.push(value);
       return totalValue.addUnsafe(value);

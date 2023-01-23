@@ -13,7 +13,7 @@ type Block = ethers.providers.Block;
 type Network = ethers.providers.Network;
 type Signer = ethers.Signer;
 
-const SUPPORTED_NETWORK_IDS: number[] = [1, 42];
+const SUPPORTED_NETWORK_IDS: number[] = [1, 5, 42];
 
 function useConnection() {
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -28,7 +28,7 @@ function useConnection() {
     const onboardInstance = Onboard({
       dappId: config(network).onboardConfig.apiKey,
       hideBranding: true,
-      networkId: 1, // Default to main net. If on a different network will change with the subscription.
+      networkId: 5, // Default to main net. If on a different network will change with the subscription.
       subscriptions: {
         address: (address: string | null) => {
           setAddress(address);

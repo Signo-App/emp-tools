@@ -24,15 +24,13 @@ const useDevMiningCalculator = () => {
 
   // pull latest whitelist
   useEffect(() => {
-    fetch(empStatusUrl)
-      .then((response) => response.json())
-      .then((result) => {
-        setEmpWhitelist(result.empWhitelist);
-        setTotalRewards(result.totalReward);
-      })
-      .catch((err) => {
-        console.error("Error fetching Affiliates status", err);
-      });
+    const res = {
+      empWhitelist: ["0x012f25771eD17874995d4444508aD52750cF0e15"],
+      // To figure out signifance of totalReward
+      totalReward: 35000,
+    };
+    setEmpWhitelist(res.empWhitelist);
+    setTotalRewards(res.totalReward);
   }, []);
 
   useEffect(() => {

@@ -50,6 +50,7 @@ export async function getAllUmaContractInfoByChain(
   chainid: number,
   provider: Provider
 ) {
+  // console.log("DEBUG: Contracts[chainid]", Contracts[chainid])
   assert(Contracts[chainid], "Invalid chain id: " + chainid);
   return Promise.all(
     Contracts[chainid].map(([address, type, version]) => {
