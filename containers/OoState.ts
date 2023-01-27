@@ -5,7 +5,7 @@ import { utils } from "ethers";
 import Connection from "./Connection";
 import Collateral from "./Collateral";
 
-import DvmContracts from "./DvmContracts";
+import OoContracts from "./OoContracts";
 import EmpState from "./EmpState";
 import EmpAddress from "./EmpAddress";
 
@@ -25,7 +25,7 @@ const initState = {
 
 const useContractState = () => {
   const { block$ } = Connection.useContainer();
-  const { optimisticOracleContract } = DvmContracts.useContainer();
+  const { optimisticOracleContract } = OoContracts.useContainer();
   const {
     address: collAddress,
     decimals: collDecimals,

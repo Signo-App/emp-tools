@@ -12,7 +12,7 @@ function useContracts() {
     optimisticOracleContract,
     setOptimisticOracleContract,
   ] = useState<ethers.Contract | null>(null);
-  const setDvmContracts = async () => {
+  const setOoContracts = async () => {
     /*
       Sumero Fix: optimistic oracle implemented and unused contracts(voting and store) removed.
     */
@@ -27,7 +27,7 @@ function useContracts() {
   };
   useEffect(() => {
     setOptimisticOracleContract(null);
-    setDvmContracts();
+    setOoContracts();
   }, [provider]);
 
   return { optimisticOracleContract };
