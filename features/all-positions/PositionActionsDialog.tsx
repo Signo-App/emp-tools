@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 const { formatUnits: fromWei } = utils;
 import { useState, MouseEvent, useEffect } from "react";
 import Alert from "@material-ui/lab/Alert";
@@ -23,7 +23,7 @@ import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 
 import EmpState from "../../containers/EmpState";
-import DvmState from "../../containers/DvmState";
+import OoState from "../../containers/OoState";
 import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
@@ -78,8 +78,8 @@ const PositionActionsDialog = (props: DialogProps) => {
     currentTime,
     isExpired,
   } = empState;
-  const { dvmState } = DvmState.useContainer();
-  const { finalFee } = dvmState;
+  const { ooState } = OoState.useContainer();
+  const { finalFee } = ooState;
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
   const { latestPrice } = PriceFeed.useContainer();
@@ -191,6 +191,7 @@ const PositionActionsDialog = (props: DialogProps) => {
   const prettyAddress = (x: String) => {
     return x.substr(0, 6) + "..." + x.substr(x.length - 6, x.length);
   };
+
   if (
     activeSponsors !== null &&
     props.selectedSponsor !== null &&

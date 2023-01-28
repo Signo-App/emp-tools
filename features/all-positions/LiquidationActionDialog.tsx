@@ -13,7 +13,7 @@ import {
 } from "@material-ui/core";
 
 import EmpState from "../../containers/EmpState";
-import DvmState from "../../containers/DvmState";
+import OoState from "../../containers/OoState";
 import Token from "../../containers/Token";
 import EmpSponsors from "../../containers/EmpSponsors";
 import EmpContract from "../../containers/EmpContract";
@@ -60,8 +60,8 @@ interface DialogProps {
 
 const LiquidationActionDialog = (props: DialogProps) => {
   const { empState } = EmpState.useContainer();
-  const { dvmState } = DvmState.useContainer();
-  const { finalFee } = dvmState;
+  const { ooState } = OoState.useContainer();
+  const { finalFee } = ooState;
   const { getEtherscanUrl } = Etherscan.useContainer();
   const { contract: emp } = EmpContract.useContainer();
 

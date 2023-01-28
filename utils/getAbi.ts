@@ -5,6 +5,7 @@ import { ethers, BigNumber, Bytes, Contract } from "ethers";
 // inelegant imports, but this is the only way afaik to work in browser
 import emp1 from "@uma/core-1-2/build/contracts/ExpiringMultiParty.json";
 import emp2 from "@uma/core-2-0/build/contracts/ExpiringMultiParty.json";
+import emp3 from "../blockchain/build/contracts/ExpiringMultiParty.json";
 import perp2 from "@uma/core-2-0/build/contracts/Perpetual.json";
 import erc20 from "@uma/core-2-0/build/contracts/ExpandedERC20.json";
 import { ContractInfo } from "../containers/ContractList";
@@ -75,6 +76,42 @@ export const Contracts: ContractType[] = [
         expirationTimestamp: null,
         expiryPrice: null,
         isExpired: false,
+      };
+      state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
+      return state;
+    },
+  },
+  {
+    versions: ["3"],
+    types: ["EMP", "ExpiringMultiParty"],
+    abi: emp3.abi,
+    async getState(instance: Contract) {
+      const state = {
+        collateralCurrency: (await instance.collateralCurrency()) as string, // address
+        priceIdentifier: (await instance.priceIdentifier()) as Bytes,
+        priceIdentifierUtf8: "",
+        tokenCurrency: (await instance.tokenCurrency()) as string, // address
+        collateralRequirement: (await instance.collateralRequirement()) as BigNumber,
+        minSponsorTokens: (await instance.minSponsorTokens()) as BigNumber,
+        timerAddress: (await instance.timerAddress()) as string, // address
+        // ToDo comment to add
+        cumulativeFeeMultiplier: ethers.utils.parseEther("1"),
+        rawTotalPositionCollateral: (await instance.totalPositionCollateral()) as BigNumber,
+        totalTokensOutstanding: (await instance.totalTokensOutstanding()) as BigNumber,
+        liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
+        withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
+        currentTime: (await instance.getCurrentTime()) as BigNumber,
+        // finderAddress: (await instance.finder()) as string, // address
+        // new
+        // fundingRate: (await instance.fundingRate()) as BigNumber,
+        // explicitly set null for missing fields
+        expirationTimestamp: (await instance.expirationTimestamp()) as BigNumber,
+        expiryPrice: (await instance.expiryPrice()) as BigNumber,
+        isExpired: false,
+        disputeBondPct: (await instance.disputeBondPercentage()) as BigNumber,
+        disputerDisputeRewardPct: (await instance.disputerDisputeRewardPercentage()) as BigNumber,
+        sponsorDisputeRewardPct: (await instance.sponsorDisputeRewardPercentage()) as BigNumber,
+        ancillaryData: (await instance.ancillaryData()) as Bytes,
       };
       state.priceIdentifierUtf8 = parseBytes32String(state.priceIdentifier);
       return state;

@@ -54,7 +54,6 @@ const Totals = () => {
   const { getEtherscanUrl } = Etherscan.useContainer();
   const exchangeInfo = getExchangeInfo(tokenSymbol);
   const defaultMissingDataDisplay = "N/A";
-
   if (
     totalCollateral !== null &&
     totalTokens !== null &&
