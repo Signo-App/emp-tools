@@ -49,7 +49,7 @@ export const EXCHANGE_LINK_MAP: ExchangeLinkMap = {
   // This returns a Balancer exchange URL to swap `tokenAddress` and sell USDC, a well understood currency
 };
 /*
-SUMERO FIX: case BTC added
+SUMERO FIX: case BTC, Gold added
 */
 // Returns a mapping from synthetic token to the type of exchange on which you can acquire the chosen token
 export const getExchangeTypeFromTokenSymbol = (symbol: string | null) => {
@@ -75,6 +75,8 @@ export const getExchangeTypeFromTokenSymbol = (symbol: string | null) => {
     case symbol?.includes("O-ETH"):
       return TOKEN_TO_EXCHANGE_MAP.openeth;
     case symbol?.includes("BTC"):
+      return TOKEN_TO_EXCHANGE_MAP.usdbtc;
+    case symbol?.includes("Gold"):
       return TOKEN_TO_EXCHANGE_MAP.usdbtc;
     default:
       return null;

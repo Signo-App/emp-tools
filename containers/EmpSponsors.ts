@@ -71,8 +71,13 @@ const useEmpSponsors = () => {
   const { latestPrice } = PriceFeed.useContainer();
   const { decimals: collDecs } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
-  const { liquidations: liquidationsEventsData } = LiquidationsData.useContainer();
-  
+  /*
+SUMERO FIX: using events data instead of subgraphs for data query
+*/
+  const {
+    liquidations: liquidationsEventsData,
+  } = LiquidationsData.useContainer();
+
   const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error } = useQuery(EMP_DATA, {
     context: { clientName: subgraphToQuery },
@@ -83,7 +88,7 @@ const useEmpSponsors = () => {
     financialContracts: [
       {
         __typename: "FinancialContract",
-        id: "0xe478461458a6846279005c9416256e230376069f",
+        id: emp?.address,
         positions: [
           {
             __typename: "SponsorPosition",
@@ -123,32 +128,6 @@ const useEmpSponsors = () => {
               __typename: "Sponsor",
               id: "0xffb607418dbeab7a888e079a34be28a30d8e1de2",
             },
-          },
-        ],
-        liquidations: [
-          {
-            __typename: "Liquidation",
-            id:
-              "0xa77ac35aa49536cd0539798eeb2fee1b72f64679-0xfa3aa7ee08399a4ce0b4921c85ab7d645ccac669-0",
-            sponsor: {
-              __typename: "Sponsor",
-              id: "0xa77ac35aa49536cd0539798eeb2fee1b72f64679",
-            },
-            liquidationId: "0",
-            liquidator: "0x428ab2ba90eba0a4be7af34c9ac451ab061ac010",
-            disputer: null,
-            tokensLiquidated: "60",
-            lockedCollateral: "8.4002",
-            liquidatedCollateral: "8.4002",
-            status: "PreDispute",
-            events: [
-              {
-                __typename: "LiquidationCreatedEvent",
-                timestamp: "1613843412",
-                tx_hash:
-                  "0xcb23eb1c291980bee6218e72971d08d6ea70200802a6c449a9dfe64e92643055",
-              },
-            ],
           },
         ],
       },
@@ -289,6 +268,7 @@ const useEmpSponsors = () => {
               }
             }
           });
+          console.log("newLiquidations", newLiquidations);
           setActivePositions(newPositions);
           setLiquidations(newLiquidations);
         }
