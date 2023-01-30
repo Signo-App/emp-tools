@@ -1,6 +1,6 @@
 import { createContainer } from "unstated-next";
 import { useState, useEffect } from "react";
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 const fromWei = utils.formatUnits;
 
 import Connection from "./Connection";
@@ -14,6 +14,7 @@ import { isPricefeedInvertedFromTokenSymbol } from "../utils/getOffchainPrice";
 
 import { useQuery } from "@apollo/client";
 import { EMP_DATA } from "../apollo/uma/queries";
+import LiquidationsData from "./LiquidationsData";
 
 // Interfaces for dApp state storage.
 interface SponsorPositionState {
@@ -70,7 +71,8 @@ const useEmpSponsors = () => {
   const { latestPrice } = PriceFeed.useContainer();
   const { decimals: collDecs } = Collateral.useContainer();
   const { symbol: tokenSymbol } = Token.useContainer();
-
+  const { liquidations: liquidationsEventsData } = LiquidationsData.useContainer();
+  
   const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error } = useQuery(EMP_DATA, {
     context: { clientName: subgraphToQuery },
@@ -242,7 +244,7 @@ const useEmpSponsors = () => {
             }
           });
 
-          empData.liquidations.forEach((liquidation) => {
+          liquidationsEventsData.forEach((liquidation) => {
             const liquidationCreatedEvent = liquidation.events.find(
               (e) => e.__typename === "LiquidationCreatedEvent"
             );
@@ -297,7 +299,7 @@ const useEmpSponsors = () => {
   // Change state when emp changes or when the graphQL data changes due to polling.
   useEffect(() => {
     querySponsors();
-  }, [emp, latestPrice]);
+  }, [emp, latestPrice, liquidationsEventsData]);
 
   return { activeSponsors: activePositions, liquidations: liquidations };
 };

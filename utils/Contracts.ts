@@ -46,9 +46,18 @@ export const Contracts: { [networkId: number]: ContractArguments[] } = {
   ],
   5: [
     ["0xe478461458a6846279005c9416256e230376069f", "EMP", "3"], // sumero emp
-    // ["0x4Aad7B81dCc4f765E6F57510e34A1bD00aFCb316", "EMP", "1"],
+    ["0x7D1d0ad876168B0654391b8ADB17D1D157a29C41", "EMP", "3"],
+    ["0xC694Ce83BCf3f7f220BC9B62354CEC6A94446eBD", "EMP", "3"],
+    ["0x15Ff9a9831146642d55079deF442f7D304Ffa027", "EMP", "3"],
   ].reverse() as ContractArguments[],
 };
+
+export const contractToBlockCreated: { [key: string]: number; } = {
+  "0x7d1d0ad876168b0654391b8adb17d1d157a29c41": 8282059,
+  "0xc694ce83bcf3f7f220bc9b62354cec6a94446ebd": 8255278,
+  "0x15ff9a9831146642d55079def442f7d304ffa027": 8297886,
+  "0xe478461458a6846279005c9416256e230376069f": 8362562,
+}
 
 export const getByAddress = (address: string, network: number) => {
   assert(Contracts[network], "Invalid Network: " + network);

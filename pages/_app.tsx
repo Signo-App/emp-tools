@@ -24,6 +24,7 @@ import DevMining from "../containers/DevMining";
 import { UniswapGetPair } from "../containers/Uniswap";
 import ContractList from "../containers/ContractList";
 import ContractState from "../containers/ContractState";
+import LiquidationsData from "../containers/LiquidationsData";
 
 import { ApolloProvider } from "@apollo/client";
 import { client } from "../apollo/client";
@@ -45,25 +46,27 @@ const WithStateContainerProviders = ({ children }: IProps) => (
                     <Token.Provider>
                       <Collateral.Provider>
                         <PriceFeed.Provider>
-                          <EmpSponsors.Provider>
-                            <Totals.Provider>
-                              <Etherscan.Provider>
-                                <Position.Provider>
-                                  <Balancer.Provider>
-                                    <DvmContracts.Provider>
-                                      <DvmState.Provider>
-                                        <DevMining.Provider>
-                                          <UniswapGetPair.Provider>
-                                            {children}
-                                          </UniswapGetPair.Provider>
-                                        </DevMining.Provider>
-                                      </DvmState.Provider>
-                                    </DvmContracts.Provider>
-                                  </Balancer.Provider>
-                                </Position.Provider>
-                              </Etherscan.Provider>
-                            </Totals.Provider>
-                          </EmpSponsors.Provider>
+                          <LiquidationsData.Provider>
+                            <EmpSponsors.Provider>
+                              <Totals.Provider>
+                                <Etherscan.Provider>
+                                  <Position.Provider>
+                                    <Balancer.Provider>
+                                      <DvmContracts.Provider>
+                                        <DvmState.Provider>
+                                          <DevMining.Provider>
+                                            <UniswapGetPair.Provider>
+                                              {children}
+                                            </UniswapGetPair.Provider>
+                                          </DevMining.Provider>
+                                        </DvmState.Provider>
+                                      </DvmContracts.Provider>
+                                    </Balancer.Provider>
+                                  </Position.Provider>
+                                </Etherscan.Provider>
+                              </Totals.Provider>
+                            </EmpSponsors.Provider>
+                          </LiquidationsData.Provider>
                         </PriceFeed.Provider>
                       </Collateral.Provider>
                     </Token.Provider>

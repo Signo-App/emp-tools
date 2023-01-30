@@ -11,7 +11,12 @@ import Connection from "./Connection";
 
 export const defaultTotalRewards = 50000;
 const sumeroEMPs = {
-  empWhitelist: ["0xe478461458A6846279005c9416256E230376069f"],
+  empWhitelist: [
+    "0xe478461458A6846279005c9416256E230376069f",
+    "0x7D1d0ad876168B0654391b8ADB17D1D157a29C41",
+    "0xC694Ce83BCf3f7f220BC9B62354CEC6A94446eBD",
+    "0x15Ff9a9831146642d55079deF442f7D304Ffa027",
+],
   totalReward: 35000,
 };
 
