@@ -8,7 +8,7 @@ import emp2 from "@uma/core-1-2/build/contracts/ExpiringMultiParty.json";
 // import emp2 from "@uma/core-2-0/build/contracts/ExpiringMultiParty.json";
 import emp3 from "../blockchain/build/contracts/ExpiringMultiParty.json";
 // import perp2 from "@uma/core-2-0/build/contracts/Perpetual.json";
-// import erc20 from "@uma/core-2-0/build/contracts/ExpandedERC20.json";
+import erc20 from "@uma/core-1-2/build/contracts/ExpandedERC20.json";
 import { ContractInfo } from "../containers/ContractList";
 
 const { parseBytes32String } = ethers.utils;
@@ -118,11 +118,11 @@ export const Contracts: ContractType[] = [
       return state;
     },
   },
-  // {
-  //   versions: ["latest"],
-  //   types: ["Erc20"],
-  //   abi: erc20.abi,
-  // },
+  {
+    versions: ["latest"],
+    types: ["Erc20"],
+    abi: erc20.abi,
+  },
 ];
 
 // This helper function for the getState calls for each contract abi version of emp tools
