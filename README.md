@@ -8,11 +8,15 @@ Live frontend:
 
 ## Install dependencies
 
-`yarn`
+1. Install nvm (node version manager) https://github.com/nvm-sh/nvm
+
+2. Install the correct node version i.e. v14.21.1 via nvm.
+
+3. `pnpm i`
 
 ## Developing on Public Network
 
-Quick run on a public network (Mainnet and Kovan supported): `yarn dev`
+Quick run on a public network (Mainnet and Kovan supported): `pnpm dev`
 
 ## Developing on Mainnet-fork
 
@@ -25,7 +29,7 @@ PRIV_KEY=0x123456789...
 
 The following instructions will spin up a test chain forked off mainnet and also swap 10 ETH to DAI on Uniswap so that you have a healthy balance of ETH and DAI to test with. You can manually test the dapp with MetaMask in your browser this way.
 
-1. Run `yarn chain`.
+1. Run `pnpm chain`.
 2. Copy the private key into MetaMask to access the account and connect to `localhost:8545`. Your balance should be ~990 ETH and a bunch of DAI.
 3. Test.
 

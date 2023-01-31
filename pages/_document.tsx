@@ -1,7 +1,7 @@
 import Document from "next/document";
 import Head from "next/head";
 import { ServerStyleSheet } from "styled-components";
-import { ServerStyleSheets } from "@material-ui/styles";
+import { ServerStyleSheets } from "@material-ui/core";
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: any) {
