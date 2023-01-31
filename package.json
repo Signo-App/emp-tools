@@ -2,6 +2,7 @@
   "name": "emp-tools",
   "version": "1.0.0",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "next",
     "build": "next build",
     "start": "next start",
