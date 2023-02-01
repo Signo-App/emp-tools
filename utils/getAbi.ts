@@ -101,7 +101,7 @@ export const Contracts: ContractType[] = [
         liquidationLiveness: (await instance.liquidationLiveness()) as BigNumber,
         withdrawalLiveness: (await instance.withdrawalLiveness()) as BigNumber,
         currentTime: (await instance.getCurrentTime()) as BigNumber,
-        // finderAddress: (await instance.finder()) as string, // address
+        finderAddress: (await instance.finder()) as string, // address
         // new
         // fundingRate: (await instance.fundingRate()) as BigNumber,
         // explicitly set null for missing fields

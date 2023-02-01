@@ -15,6 +15,7 @@ import { isPricefeedInvertedFromTokenSymbol } from "../utils/getOffchainPrice";
 import { useQuery } from "@apollo/client";
 import { EMP_DATA } from "../apollo/uma/queries";
 import LiquidationsData from "./LiquidationsData";
+import SponsorsData from "./SponsorsData";
 
 // Interfaces for dApp state storage.
 interface SponsorPositionState {
@@ -76,63 +77,19 @@ SUMERO FIX: using events data instead of subgraphs for data query
 */
   const {
     liquidations: liquidationsEventsData,
+    loading: isGettingLiquidationsData,
   } = LiquidationsData.useContainer();
+
+  const {
+    positionsData,
+    loading: isGettingPositionsData,
+  } = SponsorsData.useContainer();
 
   const subgraphToQuery = `UMA${network?.chainId.toString()}`;
   const { loading, error } = useQuery(EMP_DATA, {
     context: { clientName: subgraphToQuery },
     pollInterval: 10000,
   });
-  // Data is hardcoded
-  const data = {
-    financialContracts: [
-      {
-        __typename: "FinancialContract",
-        id: emp?.address,
-        positions: [
-          {
-            __typename: "SponsorPosition",
-            collateral: "1.064204355139777562",
-            isEnded: false,
-            tokensOutstanding: "5",
-            withdrawalRequestPassTimestamp: "0",
-            withdrawalRequestAmount: "0",
-            transferPositionRequestPassTimestamp: "0",
-            sponsor: {
-              __typename: "Sponsor",
-              id: "0x53c91f33e4da805d04dce861c536fa1674e7334d",
-            },
-          },
-          {
-            __typename: "SponsorPosition",
-            collateral: "10",
-            isEnded: false,
-            tokensOutstanding: "33",
-            withdrawalRequestPassTimestamp: "0",
-            withdrawalRequestAmount: "0",
-            transferPositionRequestPassTimestamp: "0",
-            sponsor: {
-              __typename: "Sponsor",
-              id: "0x7eb9d67f9daea510399a1ee978b36e66626058d3",
-            },
-          },
-          {
-            __typename: "SponsorPosition",
-            collateral: "41.188539593994385011",
-            isEnded: false,
-            tokensOutstanding: "125.91889443999761803",
-            withdrawalRequestPassTimestamp: "0",
-            withdrawalRequestAmount: "0",
-            transferPositionRequestPassTimestamp: "0",
-            sponsor: {
-              __typename: "Sponsor",
-              id: "0xffb607418dbeab7a888e079a34be28a30d8e1de2",
-            },
-          },
-        ],
-      },
-    ],
-  };
 
   const getCollateralRatio = (
     collateral: number,
@@ -158,120 +115,119 @@ SUMERO FIX: using events data instead of subgraphs for data query
       latestPrice !== null &&
       collateralRequirement !== null &&
       collDecs !== null &&
-      tokenSymbol !== null
+      tokenSymbol !== null &&
+      !isGettingLiquidationsData &&
+      !isGettingPositionsData
     ) {
       if (error) {
         console.error(`Apollo client failed to fetch graph data:`, error);
       }
-      if (!loading && data) {
+      if (!loading) {
         // The subgraph query doesn't have data of sumero emp contracts
-        const empData = data.financialContracts.find(
-          (contract: any) =>
-            utils.getAddress(contract.id).toLowerCase() ===
-            emp.address.toLowerCase()
-        );
-        if (empData) {
-          let newPositions: SponsorMap = {};
-          let newLiquidations: LiquidationMap = {};
+        // const empData = data.financialContracts.find(
+        //   (contract: any) =>
+        //     utils.getAddress(contract.id).toLowerCase() ===
+        //     emp.address.toLowerCase()
+        // );
+        // if (empData) {
+        let newPositions: SponsorMap = {};
+        let newLiquidations: LiquidationMap = {};
 
-          const collReqFromWei = parseFloat(fromWei(collateralRequirement));
+        const collReqFromWei = parseFloat(fromWei(collateralRequirement));
 
-          empData.positions.forEach((position: PositionQuery) => {
-            if (position.isEnded) return;
+        positionsData.forEach((position: PositionQuery) => {
+          if (position.isEnded) return;
 
-            const sponsor = utils.getAddress(position.sponsor.id);
-            const backingCollateral =
-              Number(position.collateral) -
-              Number(position.withdrawalRequestAmount);
+          const sponsor = utils.getAddress(position.sponsor.id);
+          const backingCollateral =
+            Number(position.collateral) -
+            Number(position.withdrawalRequestAmount);
 
-            const cRatio = getCollateralRatio(
-              backingCollateral,
-              Number(position.tokensOutstanding),
-              latestPrice
-            );
-            const liquidationPrice = getLiquidationPrice(
-              backingCollateral,
-              Number(position.tokensOutstanding),
-              collReqFromWei,
-              isPricefeedInvertedFromTokenSymbol(tokenSymbol)
-            );
-            const pendingWithdraw =
-              position.withdrawalRequestPassTimestamp === "0" ? "No" : "Yes";
+          const cRatio = getCollateralRatio(
+            backingCollateral,
+            Number(position.tokensOutstanding),
+            latestPrice
+          );
+          const liquidationPrice = getLiquidationPrice(
+            backingCollateral,
+            Number(position.tokensOutstanding),
+            collReqFromWei,
+            isPricefeedInvertedFromTokenSymbol(tokenSymbol)
+          );
+          const pendingWithdraw =
+            position.withdrawalRequestPassTimestamp === "0" ? "No" : "Yes";
 
-            const pendingTransfer =
-              position.transferPositionRequestPassTimestamp === "0"
-                ? "No"
-                : "Yes";
+          const pendingTransfer =
+            position.transferPositionRequestPassTimestamp === "0"
+              ? "No"
+              : "Yes";
+          if (
+            position.tokensOutstanding !== "0" &&
+            position.collateral !== "0"
+          ) {
+            newPositions[sponsor] = {
+              tokensOutstanding: position.tokensOutstanding,
+              collateral: position.collateral,
+              backingCollateral: backingCollateral.toString(),
+              cRatio: cRatio.toString(),
+              liquidationPrice: liquidationPrice.toString(),
+              pendingWithdraw: pendingWithdraw,
+              pendingTransfer: pendingTransfer,
+              withdrawalRequestAmount: position.withdrawalRequestAmount,
+              withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
+              transferTimestamp: position.transferPositionRequestPassTimestamp,
+              sponsor,
+            };
+          }
+        });
+
+        liquidationsEventsData.forEach((liquidation) => {
+          const liquidationCreatedEvent = liquidation.events.find(
+            (e) => e.__typename === "LiquidationCreatedEvent"
+          );
+
+          // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
+          // we will just ignore this strange edge case.
+          if (liquidationCreatedEvent) {
+            const liquidatedCR =
+              parseFloat(liquidation.tokensLiquidated) > 0
+                ? parseFloat(liquidation.liquidatedCollateral) /
+                  parseFloat(liquidation.tokensLiquidated)
+                : 0;
+            const maxDisputablePrice =
+              parseFloat(liquidation.tokensLiquidated) > 0 && collReqFromWei > 0
+                ? parseFloat(liquidation.liquidatedCollateral) /
+                  (parseFloat(liquidation.tokensLiquidated) * collReqFromWei)
+                : 0;
+
             if (
-              position.tokensOutstanding !== "0" &&
-              position.collateral !== "0"
+              liquidation.tokensLiquidated !== "0" &&
+              liquidation.lockedCollateral !== "0"
             ) {
-              newPositions[sponsor] = {
-                tokensOutstanding: position.tokensOutstanding,
-                collateral: position.collateral,
-                backingCollateral: backingCollateral.toString(),
-                cRatio: cRatio.toString(),
-                liquidationPrice: liquidationPrice.toString(),
-                pendingWithdraw: pendingWithdraw,
-                pendingTransfer: pendingTransfer,
-                withdrawalRequestAmount: position.withdrawalRequestAmount,
-                withdrawalTimestamp: position.withdrawalRequestPassTimestamp,
-                transferTimestamp:
-                  position.transferPositionRequestPassTimestamp,
-                sponsor,
+              // The UMA subgraph uniquely identifies each liquidation with an "id" that concatenates
+              // the liquidated sponsor's address with the liquidation ID, for example:
+              // "0x1e17a75616cd74f5846b1b71622aa8e10ea26cc0-0"
+              const sponsorAddressPlusId = liquidation.id;
+              newLiquidations[sponsorAddressPlusId] = {
+                sponsor: utils.getAddress(liquidation.sponsor.id),
+                liquidator: liquidation.liquidator,
+                disputer: String(liquidation.disputer),
+                liquidationId: liquidation.liquidationId,
+                liquidatedCR: liquidatedCR.toString(),
+                maxDisputablePrice: maxDisputablePrice.toString(),
+                tokensLiquidated: liquidation.tokensLiquidated,
+                lockedCollateral: liquidation.lockedCollateral,
+                liquidatedCollateral: liquidation.liquidatedCollateral,
+                status: liquidation.status,
+                liquidationTimestamp: liquidationCreatedEvent.timestamp,
+                liquidationReceipt: liquidationCreatedEvent.tx_hash,
               };
             }
-          });
-
-          liquidationsEventsData.forEach((liquidation) => {
-            const liquidationCreatedEvent = liquidation.events.find(
-              (e) => e.__typename === "LiquidationCreatedEvent"
-            );
-
-            // There should always be a LiquidationCreatedEvent associated with each liquidation object, but if not then
-            // we will just ignore this strange edge case.
-            if (liquidationCreatedEvent) {
-              const liquidatedCR =
-                parseFloat(liquidation.tokensLiquidated) > 0
-                  ? parseFloat(liquidation.liquidatedCollateral) /
-                    parseFloat(liquidation.tokensLiquidated)
-                  : 0;
-              const maxDisputablePrice =
-                parseFloat(liquidation.tokensLiquidated) > 0 &&
-                collReqFromWei > 0
-                  ? parseFloat(liquidation.liquidatedCollateral) /
-                    (parseFloat(liquidation.tokensLiquidated) * collReqFromWei)
-                  : 0;
-
-              if (
-                liquidation.tokensLiquidated !== "0" &&
-                liquidation.lockedCollateral !== "0"
-              ) {
-                // The UMA subgraph uniquely identifies each liquidation with an "id" that concatenates
-                // the liquidated sponsor's address with the liquidation ID, for example:
-                // "0x1e17a75616cd74f5846b1b71622aa8e10ea26cc0-0"
-                const sponsorAddressPlusId = liquidation.id;
-                newLiquidations[sponsorAddressPlusId] = {
-                  sponsor: utils.getAddress(liquidation.sponsor.id),
-                  liquidator: liquidation.liquidator,
-                  disputer: String(liquidation.disputer),
-                  liquidationId: liquidation.liquidationId,
-                  liquidatedCR: liquidatedCR.toString(),
-                  maxDisputablePrice: maxDisputablePrice.toString(),
-                  tokensLiquidated: liquidation.tokensLiquidated,
-                  lockedCollateral: liquidation.lockedCollateral,
-                  liquidatedCollateral: liquidation.liquidatedCollateral,
-                  status: liquidation.status,
-                  liquidationTimestamp: liquidationCreatedEvent.timestamp,
-                  liquidationReceipt: liquidationCreatedEvent.tx_hash,
-                };
-              }
-            }
-          });
-          console.log("newLiquidations", newLiquidations);
-          setActivePositions(newPositions);
-          setLiquidations(newLiquidations);
-        }
+          }
+        });
+        console.log("newLiquidations", newLiquidations);
+        setActivePositions(newPositions);
+        setLiquidations(newLiquidations);
       }
     }
   };
